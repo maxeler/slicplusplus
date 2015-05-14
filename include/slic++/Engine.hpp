@@ -2,8 +2,14 @@
 #define SLICPLUSPLUS_ENGINE_HPP_
 
 #include "Actions.hpp"
+#include "FramedStream.hpp"
+#include "LLStream.hpp"
 #include "NetConnection.hpp"
 #include "Run.hpp"
+#include "TcpSocket.hpp"
+#include "UdpSocket.hpp"
+
+extern "C" max_file_t* max_engine_get_max_file(max_engine_t *engine);
 
 SLIC_BEGIN_NAMESPACE
 
@@ -50,7 +56,45 @@ public:
 	}
 
 	NetConnection getNetworkConnection(max_net_connection_t connection) {
-		return NetConnection(e.get(), connection);
+		return { e.get(), connection };
+	}
+
+	NetConnection getTcpStreamNetworkConnection(const std::string& streamName) {
+		auto mf  = max_engine_get_max_file(e.get());
+		auto ret = getNetworkConnection(max_tcp_get_network_connection(mf, streamName.c_str()));
+		SLIC_CHECK_ERRORS(mf->errors)
+		return ret;
+	}
+
+	NetConnection getUdpStreamNetworkConnection(const std::string& streamName) {
+		auto mf  = max_engine_get_max_file(e.get());
+		auto ret = getNetworkConnection(max_udp_get_network_connection(mf, streamName.c_str()));
+		SLIC_CHECK_ERRORS(mf->errors)
+		return ret;
+	}
+
+	LLStream getLowLatencyStream(const std::string& name, size_t slotSize, size_t numSlots=LLStream::MAX_SLOTS) {
+		return { e.get(), name, numSlots, slotSize };
+	}
+
+	FramedStream getFramedStream(const std::string& name, size_t bufferSize, size_t maxFrameSize) {
+		return { e.get(), name, bufferSize, maxFrameSize };
+	}
+
+	TcpSocket getTcpSocket(const std::string& name) {
+		return { e.get(), name };
+	}
+
+	TcpSocket getTcpSocket(const std::string& name, uint16_t socketNumber) {
+		return { e.get(), name, socketNumber };
+	}
+
+	UdpSocket getUdpSocket(const std::string& name) {
+		return { e.get(), name };
+	}
+
+	UdpSocket getUdpSocket(const std::string& name, uint16_t socketNumber) {
+		return { e.get(), name, socketNumber };
 	}
 };
 

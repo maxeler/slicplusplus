@@ -50,18 +50,6 @@ public:
 	bool isSimulation() const {
 		return (getConstant("IS_SIMULATION") == 1);
 	}
-
-	max_net_connection_t getTcpStreamNetworkConnection(const std::string& streamName) {
-		auto ret = max_tcp_get_network_connection(mf.get(), streamName.c_str());
-		SLIC_CHECK_ERRORS(mf->errors)
-		return ret;
-	}
-
-	max_net_connection_t getUdpStreamNetworkConnection(const std::string& streamName) {
-		auto ret = max_udp_get_network_connection(mf.get(), streamName.c_str());
-		SLIC_CHECK_ERRORS(mf->errors)
-		return ret;
-	}
 };
 
 SLIC_END_NAMESPACE

@@ -2,17 +2,22 @@
 #define SLICPLUSPLUS_LLSTREAM_HPP_
 
 #include <stdexcept>
+#include <MaxSLiCInterface.h>
 #include "internal/MemAlignedBuffer.hpp"
 
 SLIC_BEGIN_NAMESPACE
 
+class Engine;
+
 class LLStream {
+	friend class Engine;
+
 	static constexpr size_t MAX_SLOTS = 512;
 
 	MemAlignedBuffer buf;
 	std::unique_ptr<max_llstream_t, decltype(max_llstream_release)> ll;
 
-	LLStream(max_engine_t* engine, const std::string& name, size_t slotSize, size_t numSlots=MAX_SLOTS)
+	LLStream(max_engine_t* engine, const std::string& name, size_t numSlots, size_t slotSize)
 	 : buf(numSlots*slotSize),
 	   ll(max_llstream_setup(engine, name.c_str(), numSlots, slotSize, buf), max_llstream_release)
 	{
