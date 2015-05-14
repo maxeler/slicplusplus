@@ -13,7 +13,7 @@ class Engine;
 class TcpSocket {
 	friend class Engine;
 
-	std::unique_ptr<max_tcp_socket_t, decltype(max_tcp_close)> s;
+	std::unique_ptr<max_tcp_socket_t, decltype(max_tcp_close)*> s;
 
 	TcpSocket(max_engine_t* engine, const std::string& streamName)
 	 : s(max_tcp_create_socket(engine, streamName.c_str()), max_tcp_close) {}

@@ -7,7 +7,7 @@
 SLIC_BEGIN_NAMESPACE
 
 class Actions {
-	std::unique_ptr<max_actions_t, decltype(max_actions_free)> a;
+	std::unique_ptr<max_actions_t, decltype(max_actions_free)*> a;
 
 public:
 	explicit Actions(const MaxFile& maxfile, const std::string& mode="")
@@ -188,23 +188,13 @@ public:
 	 * 1 = valid, 0 = not valid
 	 */
 	int validate() {
-		auto ret = max_validate(actions);
+		auto ret = max_validate(a.get());
 		SLIC_CHECK_ERRORS(a->errors)
 		return ret;
 	}
 
-	void setDebugDir(const std::string& kernelName, const std::string& debugDir) {
-		max_debug_dir(a.get(), kernelName.c_str(), debugDir.c_str());
-		SLIC_CHECK_ERRORS(a->errors)
-	}
-
 	void setWatchRange(const std::string& kernelName, int minTick, int maxTick) {
 		max_watch_range(a.get(), kernelName.c_str(), minTick, maxTick);
-		SLIC_CHECK_ERRORS(a->errors)
-	}
-
-	void setPrintTo(const std::string& kernelName, const std::string& filename) {
-		max_printto(a.get(), kernelName.c_str(), filename.c_str());
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 };

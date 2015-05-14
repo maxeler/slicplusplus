@@ -14,7 +14,7 @@ extern "C" max_file_t* max_engine_get_max_file(max_engine_t *engine);
 SLIC_BEGIN_NAMESPACE
 
 class Engine {
-	std::unique_ptr<max_engine_t, decltype(max_unload)> e;
+	std::unique_ptr<max_engine_t, decltype(max_unload)*> e;
 
 public:
 	explicit Engine(const MaxFile& maxfile, const std::string& id="*")

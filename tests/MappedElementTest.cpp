@@ -43,7 +43,7 @@ int main() {
 
 	// the output vectors are sized correctly above
 	for (uint i = 0; i < N; ++i) {
-		actions.getMem("MappedElementTestKernel", "result", i, &fromRAM[n]);
+		actions.getMem("MappedElementTestKernel", "result", i, &fromRAM[i]);
 	}
 
 	actions.queueOutput("output", fromStream.data(), fromStream.size()*sizeof(double));

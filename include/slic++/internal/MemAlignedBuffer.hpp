@@ -9,10 +9,10 @@ SLIC_BEGIN_NAMESPACE
 class MemAlignedBuffer {
 	static constexpr size_t PAGE_SIZE = 4096;
 
-	std::unique_ptr<void, decltype(free)> buf;
+	std::unique_ptr<void, decltype(free)*> buf;
 
 public:
-	MemAlignedBuffer(size_t size) {
+	MemAlignedBuffer(size_t size) : buf(nullptr, free) {
 		void* tmp;
 		if (posix_memalign(&tmp, PAGE_SIZE, size)) throw std::bad_alloc();
 		buf = { tmp, free };

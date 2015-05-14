@@ -8,7 +8,7 @@
 	if (!max_ok(E)) {                               \
 		auto msg = max_errors_trace(E);             \
 		auto err = std::runtime_error(msg);         \
-		max_clear_errors(E);                        \
+		max_errors_clear(E);                        \
 		free(msg);                                  \
 		throw err;                                  \
 	}

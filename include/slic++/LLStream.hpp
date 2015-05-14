@@ -15,7 +15,7 @@ class LLStream {
 	static constexpr size_t MAX_SLOTS = 512;
 
 	MemAlignedBuffer buf;
-	std::unique_ptr<max_llstream_t, decltype(max_llstream_release)> ll;
+	std::unique_ptr<max_llstream_t, decltype(max_llstream_release)*> ll;
 
 	LLStream(max_engine_t* engine, const std::string& name, size_t numSlots, size_t slotSize)
 	 : buf(numSlots*slotSize),

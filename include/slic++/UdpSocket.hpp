@@ -12,7 +12,7 @@ class Engine;
 class UdpSocket {
 	friend class Engine;
 
-	std::unique_ptr<max_udp_socket_t, decltype(max_udp_close)> s;
+	std::unique_ptr<max_udp_socket_t, decltype(max_udp_close)*> s;
 
 	UdpSocket(max_engine_t* engine, const std::string& streamName)
 	 : s(max_udp_create_socket(engine, streamName.c_str()), max_udp_close) {}

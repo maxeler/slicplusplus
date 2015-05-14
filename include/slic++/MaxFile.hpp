@@ -14,7 +14,7 @@
 SLIC_BEGIN_NAMESPACE
 
 class MaxFile {
-	std::unique_ptr<max_file_t, decltype(max_file_free)> mf;
+	std::unique_ptr<max_file_t, decltype(max_file_free)*> mf;
 
 public:
 	explicit MaxFile(const std::function<max_file_t*()>& initFn) : mf(initFn(), max_file_free) {

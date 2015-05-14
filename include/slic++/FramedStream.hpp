@@ -13,7 +13,7 @@ class FramedStream {
 	friend class Engine;
 
 	MemAlignedBuffer buf;
-	std::unique_ptr<max_framed_stream_t, decltype(max_framed_stream_release)> fs;
+	std::unique_ptr<max_framed_stream_t, decltype(max_framed_stream_release)*> fs;
 
 	FramedStream(max_engine_t* engine, const std::string& name, size_t bufferSize, size_t maxFrameSize)
 	 : buf(bufferSize),
@@ -24,19 +24,19 @@ class FramedStream {
 
 public:
 	size_t read(size_t numFrames, void** frames, size_t* frameSizes) {
-		return max_framed_stream_read(stream, numFrames, frames, frameSizes);
+		return max_framed_stream_read(fs.get(), numFrames, frames, frameSizes);
 	}
 
 	void readDiscard(size_t numFrames) {
-		max_framed_stream_discard(stream, numFrames);
+		max_framed_stream_discard(fs.get(), numFrames);
 	}
 
 	size_t writeAcquire(size_t numFrames, void** frames) {
-		return max_framed_stream_write_acquire(stream, numFrames, frames);
+		return max_framed_stream_write_acquire(fs.get(), numFrames, frames);
 	}
 
 	void write(size_t numFrames, size_t* sizes) {
-		max_framed_stream_write(stream, numFrames, sizes);
+		max_framed_stream_write(fs.get(), numFrames, sizes);
 	}
 };
 
