@@ -41,7 +41,7 @@ public:
 		return ret;
 	}
 
-	std::string getStringConstant(const std::string& name) const {
+	const char* getStringConstant(const std::string& name) const {
 		auto ret = max_get_constant_string(mf.get(), name.c_str());
 		SLIC_CHECK_ERRORS(mf->errors)
 		return ret;
