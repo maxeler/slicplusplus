@@ -15,9 +15,9 @@ SLIC_DESIGN(MappedElementTest)
 
 int main() {
 	MaxFile maxfile(&MappedElementTest_init);
-	Actions actions(maxfile, "default");
+	Actions actions(maxfile);
 
-	auto N = maxfile.getConstant("N");
+	const uint N = 10000;
 
 	// inputs
 	srand(12345);
@@ -28,11 +28,10 @@ int main() {
 	for (int n = 0; n < N; ++n)
 		b[n] = rand();
 
+	actions.setTicks("MappedElementTestKernel", N);
 	actions.set("MappedElementTestKernel", "a", a);
 	actions.setMem("MappedElementTestKernel", "b", b);
 	actions.ignoreMemInput("MappedElementTestKernel", "result"); // this is an output
-
-	// # ticks is set implicitly by using the 'default' mode for this bitstream
 
 	// outputs
 	double first, second;
