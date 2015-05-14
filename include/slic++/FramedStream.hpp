@@ -1,35 +1,28 @@
 #ifndef SLICPLUSPLUS_FRAMEDSTREAM_HPP_
 #define SLICPLUSPLUS_FRAMEDSTREAM_HPP_
 
-#include "MaxSLiCInterface.h"
-#include "SlicConfig.hpp"
+#include <stdexcept>
+#include "internal/MemAlignedBuffer.hpp"
 
 SLIC_BEGIN_NAMESPACE
 
-class Engine;
-SLIC_DECLARE(FramedStream)
-
 class FramedStream {
-	friend class Engine;
+	MemAlignedBuffer buf;
+	std::unique_ptr<max_framed_stream_t, decltype(max_framed_stream_release)> fs;
 
-	void* buffer;
-	max_framed_stream_t* stream;
-
-	FramedStream(max_engine_t* engine, const std::string& name, size_t bufferSize, size_t maxFrameSize) {
-		posix_memalign(&buffer, 4096, bufferSize);
-		stream = max_framed_stream_setup(engine, name.c_str(), buffer, bufferSize, maxFrameSize);
+	FramedStream(max_engine_t* engine, const std::string& name, size_t bufferSize, size_t maxFrameSize)
+	 : buf(bufferSize),
+	   fs(max_framed_stream_setup(engine, name.c_str(), buffer, bufferSize, maxFrameSize), max_framed_stream_release)
+	{
+		if (!fs) throw std::runtime_error("Failed to instantiate framed stream");
 	}
 
 public:
-	~FramedStream() {
-		release();
-	}
-
 	size_t read(size_t numFrames, void** frames, size_t* frameSizes) {
 		return max_framed_stream_read(stream, numFrames, frames, frameSizes);
 	}
 
-	void readDiscard(size_t numFrames = 1) {
+	void readDiscard(size_t numFrames) {
 		max_framed_stream_discard(stream, numFrames);
 	}
 
@@ -39,16 +32,6 @@ public:
 
 	void write(size_t numFrames, size_t* sizes) {
 		max_framed_stream_write(stream, numFrames, sizes);
-	}
-
-	void release() {
-		if (stream) {
-			max_framed_stream_release(stream);
-			stream = 0;
-		}
-
-		free(buffer);
-		buffer = 0;
 	}
 };
 

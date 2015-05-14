@@ -1,10 +1,10 @@
 #ifndef SLICPLUSPLUS_MAXFILE_HPP_
 #define SLICPLUSPLUS_MAXFILE_HPP_
 
+#include <memory>
 #include <string>
-#include "MaxSLiCInterface.h"
+#include "Common.hpp"
 #include "Errors.hpp"
-#include "SlicConfig.hpp"
 
 #define SLIC_DESIGN(A)				\
 	extern "C" {					\
@@ -13,66 +13,56 @@
 
 SLIC_BEGIN_NAMESPACE
 
-class Actions;
-class Engine;
-class EngineArray;
-class EngineGroup;
-SLIC_DECLARE(MaxFile)
-
 class MaxFile {
-	friend class Actions;
-	friend class Engine;
-	friend class EngineArray;
-	friend class EngineGroup;
-
-	typedef max_file_t* (*MaxFileInitFn)(void);
-
-	max_file_t* maxfile;
-
-	MaxFile(MaxFileInitFn initFn)
-		: maxfile(initFn()) {}
+	std::unique_ptr<max_file_t, decltype(max_file_free)> mf;
 
 public:
-	static MaxFileSP init(MaxFileInitFn initFn) {
-		return MaxFileSP(new MaxFile(initFn));
+	explicit MaxFile(const std::function<max_file_t*()>& initFn) : mf(initFn(), max_file_free) {
+		max_errors_mode(mf->errors, 0);
 	}
 
-	~MaxFile() {
-		max_file_free(maxfile);
+	max_file_t* get() const noexcept {
+		return mf.get();
 	}
 
-	template <typename T>
-	T getConstant(const std::string& name) const {
-		return T(max_get_constant_uint64t(maxfile, name.c_str()));
+	max_file_t* release() noexcept {
+		return mf.release();
+	}
+
+	uint64_t getConstant(const std::string& name) const {
+		auto ret = max_get_constant_uint64t(mf.get(), name.c_str());
+		SLIC_CHECK_ERRORS(mf->errors)
+		return ret;
+	}
+
+	double getDoubleConstant(const std::string& name) const {
+		auto ret = max_get_constant_double(mf.get(), name.c_str());
+		SLIC_CHECK_ERRORS(mf->errors)
+		return ret;
 	}
 
 	std::string getStringConstant(const std::string& name) const {
-		return getConstant<std::string>(name);
+		auto ret = max_get_constant_string(mf.get(), name.c_str());
+		SLIC_CHECK_ERRORS(mf->errors)
+		return ret;
 	}
 
 	bool isSimulation() const {
-		return getConstant<bool>("IS_SIMULATION");
-	}
-
-	int getBurstSize(const std::string& name) const {
-		return max_get_burst_size(maxfile, name.c_str());
+		return (getConstant("IS_SIMULATION") == 1);
 	}
 
 	max_net_connection_t getTcpStreamNetworkConnection(const std::string& streamName) {
-		return max_tcp_get_network_connection(maxfile, streamName.c_str());
+		auto ret = max_tcp_get_network_connection(mf.get(), streamName.c_str());
+		SLIC_CHECK_ERRORS(mf->errors)
+		return ret;
 	}
 
 	max_net_connection_t getUdpStreamNetworkConnection(const std::string& streamName) {
-		return max_udp_get_network_connection(maxfile, streamName.c_str());
+		auto ret = max_udp_get_network_connection(mf.get(), streamName.c_str());
+		SLIC_CHECK_ERRORS(mf->errors)
+		return ret;
 	}
-
-	SLIC_ERROR_FUNCTIONS(maxfile->errors)
 };
-
-template <>
-std::string MaxFile::getConstant(const std::string& name) const {
-	return max_get_constant_string(maxfile, name.c_str());
-}
 
 SLIC_END_NAMESPACE
 

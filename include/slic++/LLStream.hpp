@@ -1,54 +1,39 @@
 #ifndef SLICPLUSPLUS_LLSTREAM_HPP_
 #define SLICPLUSPLUS_LLSTREAM_HPP_
 
-#include "MaxSLiCInterface.h"
-#include "SlicConfig.hpp"
+#include <stdexcept>
+#include "internal/MemAlignedBuffer.hpp"
 
 SLIC_BEGIN_NAMESPACE
 
-class Engine;
-
-template <typename SlotT>
 class LLStream {
-	friend class Engine;
+	static constexpr size_t MAX_SLOTS = 512;
 
-	SlotT* buffer;
-	max_llstream_t* llstream;
+	MemAlignedBuffer buf;
+	std::unique_ptr<max_llstream_t, decltype(max_llstream_release)> ll;
 
-	LLStream(max_engine_t* engine, const std::string& name, size_t numSlots) {
-		posix_memalign(&buffer, 4096, numSlots * sizeof(SlotT));
-		llstream = max_llstream_setup(engine, name.c_str(), numSlots, sizeof(SlotT), buffer.data());
+	LLStream(max_engine_t* engine, const std::string& name, size_t slotSize, size_t numSlots=MAX_SLOTS)
+	 : buf(numSlots*slotSize),
+	   ll(max_llstream_setup(engine, name.c_str(), numSlots, slotSize, buf), max_llstream_release)
+	{
+		if (!ll) throw std::runtime_error("Failed to instantiate llstream");
 	}
 
 public:
-	~LLStream() {
-		release();
+	ssize_t read(size_t maxSlots, void** slots) {
+		return max_llstream_read(ll.get(), maxSlots, slots);
 	}
 
-	ssize_t read(size_t maxSlots, SlotT** slots) {
-		return max_llstream_read(llstream, maxSlots, slots);
+	void readDiscard(size_t numSlots) {
+		max_llstream_read_discard(ll.get(), numSlots);
 	}
 
-	void readDiscard(size_t numSlots = 1) {
-		max_llstream_read_discard(llstream, numSlots);
+	ssize_t writeAcquire(size_t maxSlots, void** slots) {
+		return max_llstream_write_acquire(ll.get(), maxSlots, slots);
 	}
 
-	ssize_t writeAcquire(size_t maxSlots, SlotT** slots) {
-		return max_llstream_write_acquire(llstream, maxSlots, slots);
-	}
-
-	void write(size_t numSlots = 1) {
-		max_llstream_write(llstream, numSlots);
-	}
-
-	void release() {
-		if (llstream) {
-			max_llstream_release(llstream);
-			llstream = 0;
-		}
-
-		free(buffer);
-		buffer = 0;
+	void write(size_t numSlots) {
+		max_llstream_write(ll.get(), numSlots);
 	}
 };
 

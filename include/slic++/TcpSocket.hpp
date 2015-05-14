@@ -1,70 +1,69 @@
 #ifndef SLICPLUSPLUS_TCPSOCKET_HPP_
 #define SLICPLUSPLUS_TCPSOCKET_HPP_
 
-#include "MaxSLiCInterface.h"
-#include "SlicConfig.hpp"
+#include <memory>
+#include <string>
+#include <MaxSLiCInterface.h>
+#include "Common.hpp"
 
 SLIC_BEGIN_NAMESPACE
 
 class Engine;
-SLIC_DECLARE(TcpSocket)
 
 class TcpSocket {
 	friend class Engine;
 
-	max_tcp_socket_t* socket;
+	std::unique_ptr<max_tcp_socket_t, decltype(max_tcp_close)> s;
 
 	TcpSocket(max_engine_t* engine, const std::string& streamName)
-		: socket(max_tcp_create_socket(engine, streamName.c_str())) {}
+	 : s(max_tcp_create_socket(engine, streamName.c_str()), max_tcp_close) {}
 
 	TcpSocket(max_engine_t* engine, const std::string& streamName, uint16_t socketNumber)
-		: socket(max_tcp_create_socket_with_number(engine, streamName.c_str(), socketNumber)) {}
+	 : s(max_tcp_create_socket_with_number(engine, streamName.c_str(), socketNumber), max_tcp_close) {}
 
 public:
-	~TcpSocket() {
-		close();
+	max_tcp_socket_t* get() const noexcept {
+		return s.get();
+	}
+
+	max_tcp_socket_t* release() noexcept {
+		return s.release();
 	}
 
 	void setupFraming(max_tcp_sized_config_t config) {
-		max_tcp_setup_framing(socket, config);
+		max_tcp_setup_framing(s.get(), config);
 	}
 
 	void setupAdvanced(uint32_t rxWindowSizeBytes, uint32_t txWindowSizeBytes) {
-		max_tcp_setup_socket_advanced(socket, rxWindowSizeBytes, txWindowSizeBytes);
+		max_tcp_setup_socket_advanced(s.get(), rxWindowSizeBytes, txWindowSizeBytes);
 	}
 
 	void connect(const struct in_addr* remoteIP, uint16_t remotePort) {
-		max_tcp_connect(socket, remoteIP, remotePort);
+		max_tcp_connect(s.get(), remoteIP, remotePort);
 	}
 
 	void listen(uint16_t localPort) {
-		max_tcp_listen(socket, localPort);
+		max_tcp_listen(s.get(), localPort);
 	}
 
 	uint16_t getSocketNumber() {
-		return max_tcp_get_socket_number(socket);
+		return max_tcp_get_socket_number(s.get());
 	}
 
 	int awaitState(max_tcp_connection_state_t state, struct timeval* timeout) {
-		return max_tcp_await_state(socket, state, timeout);
+		return max_tcp_await_state(s.get(), state, timeout);
 	}
 
 	max_tcp_connection_state_t getState() {
-		return max_tcp_get_connection_state(socket);
+		return max_tcp_get_connection_state(s.get());
 	}
 
 	void close() {
-		if (socket) {
-			max_tcp_close(socket);
-			socket = 0;
-		}
+		max_tcp_close(s.release());
 	}
 
 	void close(max_tcp_close_mode_t closeMode) {
-		if (socket) {
-			max_tcp_close_advanced(socket, closeMode);
-			socket = 0;
-		}
+		max_tcp_close_advanced(s.release(), closeMode);
 	}
 };
 

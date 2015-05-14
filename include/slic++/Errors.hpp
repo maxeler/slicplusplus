@@ -1,25 +1,16 @@
 #ifndef SLICPLUSPLUS_ERRORS_HPP_
 #define SLICPLUSPLUS_ERRORS_HPP_
 
-#define SLIC_ERROR_FUNCTIONS(E)					\
-	int ok() {									\
-		return max_ok(E);						\
-	}											\
-												\
-	void clearErrors() {						\
-		return max_errors_clear(E);				\
-	}											\
-												\
-	int checkError(int errorCode) {				\
-		return max_errors_check(E, errorCode);	\
-	}											\
-												\
-	char* getErrorTrace() {						\
-		return max_errors_trace(E);				\
-	}											\
-												\
-	void setErrorMode(bool abortOnError) {		\
-		max_errors_mode(E, abortOnError);		\
-	}											\
+#include <stdexcept>
+#include <MaxSLiCInterface.h>
+
+#define SLIC_CHECK_ERRORS(E)                        \
+	if (!max_ok(E)) {                               \
+		auto msg = max_errors_trace(E);             \
+		auto err = std::runtime_error(msg);         \
+		max_clear_errors(E);                        \
+		free(msg);                                  \
+		throw err;                                  \
+	}
 
 #endif /* SLICPLUSPLUS_ERRORS_HPP_ */
