@@ -73,27 +73,27 @@ public:
 		return ret;
 	}
 
-	LLStream getLowLatencyStream(const std::string& name, size_t slotSize, size_t numSlots=LLStream::MAX_SLOTS) {
+	LLStream createLowLatencyStream(const std::string& name, size_t slotSize, size_t numSlots=LLStream::MAX_SLOTS) {
 		return { e.get(), name, numSlots, slotSize };
 	}
 
-	FramedStream getFramedStream(const std::string& name, size_t bufferSize, size_t maxFrameSize) {
+	FramedStream createFramedStream(const std::string& name, size_t bufferSize, size_t maxFrameSize) {
 		return { e.get(), name, bufferSize, maxFrameSize };
 	}
 
-	TcpSocket getTcpSocket(const std::string& name) {
+	TcpSocket createTcpSocket(const std::string& name) {
 		return { e.get(), name };
 	}
 
-	TcpSocket getTcpSocket(const std::string& name, uint16_t socketNumber) {
+	TcpSocket createTcpSocket(const std::string& name, uint16_t socketNumber) {
 		return { e.get(), name, socketNumber };
 	}
 
-	UdpSocket getUdpSocket(const std::string& name) {
+	UdpSocket createUdpSocket(const std::string& name) {
 		return { e.get(), name };
 	}
 
-	UdpSocket getUdpSocket(const std::string& name, uint16_t socketNumber) {
+	UdpSocket createUdpSocket(const std::string& name, uint16_t socketNumber) {
 		return { e.get(), name, socketNumber };
 	}
 };

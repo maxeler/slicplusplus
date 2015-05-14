@@ -48,12 +48,42 @@ public:
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
+	void ignoreScalar(const std::string& blockName, const std::string& regName) {
+		max_ignore_scalar(a.get(), blockName.c_str(), regName.c_str());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
 	////////////////////
 	// PARAMS, OFFSETS
 	////////////////////
 
+	void setParam(const std::string& name, double value) {
+		max_set_param_double(a.get(), name.c_str(), value);
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void setParam(const std::string& name, uint64_t value) {
+		max_set_param_uint64t(a.get(), name.c_str(), value);
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void ignoreKernel(const std::string& kernelName) {
+		max_ignore_kernel(a.get(), kernelName.c_str());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
 	void setTicks(const std::string& kernelName, int ticks) {
 		max_set_ticks(a.get(), kernelName.c_str(), ticks);
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void setOffset(const std::string& kernelName, const std::string& varName, int value) {
+		max_set_offset(a.get(), kernelName.c_str(), varName.c_str(), value);
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void ignoreOffset(const std::string& kernelName, const std::string& varName) {
+		max_ignore_offset(a.get(), kernelName.c_str(), varName.c_str());
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
@@ -71,6 +101,12 @@ public:
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
+	template <typename T>
+	void setMem(const std::string& blockName, const std::string& memName, const std::vector<T>& values) {
+		for (size_t idx = 0; idx < values.size(); ++idx)
+			setMem(blockName, memName, idx, values[idx]);
+	}
+
 	void getMem(const std::string& blockName, const std::string& memName, size_t idx, uint64_t* ret) {
 		max_get_mem_uint64t(a.get(), blockName.c_str(), memName.c_str(), idx, ret);
 		SLIC_CHECK_ERRORS(a->errors)
@@ -78,6 +114,21 @@ public:
 
 	void getMem(const std::string& blockName, const std::string& memName, size_t idx, double* ret) {
 		max_get_mem_double(a.get(), blockName.c_str(), memName.c_str(), idx, ret);
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void ignoreMem(const std::string& blockName, const std::string& memName) {
+		max_ignore_mem(a.get(), blockName.c_str(), memName.c_str());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void ignoreMemInput(const std::string& blockName, const std::string& memName) {
+		max_ignore_mem_input(a.get(), blockName.c_str(), memName.c_str());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void ignoreMemOutput(const std::string& blockName, const std::string& memName) {
+		max_ignore_mem_output(a.get(), blockName.c_str(), memName.c_str());
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
@@ -106,6 +157,54 @@ public:
 
 	void route(const std::string& fromName, const std::string& toName) {
 		max_route(a.get(), fromName.c_str(), toName.c_str());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void route(const std::string& route) {
+		max_route_string(a.get(), route.c_str());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void ignoreRoute(const std::string& blockName) {
+		max_ignore_route(a.get(), blockName.c_str());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	////////////////////
+	// MISC
+	////////////////////
+
+	void disableReset() {
+		max_disable_reset(a.get());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void disableValidation() {
+		max_disable_validation(a.get());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	/**
+	 * 1 = valid, 0 = not valid
+	 */
+	int validate() {
+		auto ret = max_validate(actions);
+		SLIC_CHECK_ERRORS(a->errors)
+		return ret;
+	}
+
+	void setDebugDir(const std::string& kernelName, const std::string& debugDir) {
+		max_debug_dir(a.get(), kernelName.c_str(), debugDir.c_str());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void setWatchRange(const std::string& kernelName, int minTick, int maxTick) {
+		max_watch_range(a.get(), kernelName.c_str(), minTick, maxTick);
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void setPrintTo(const std::string& kernelName, const std::string& filename) {
+		max_printto(a.get(), kernelName.c_str(), filename.c_str());
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 };
