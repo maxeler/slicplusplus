@@ -1,0 +1,50 @@
+package com.maxeler.slic.tests;
+
+import com.maxeler.maxcompiler.v2.build.EngineParameters;
+import com.maxeler.maxcompiler.v2.kernelcompiler.Kernel;
+import com.maxeler.maxcompiler.v2.kernelcompiler.KernelParameters;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.Mem.RamPortMode;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.Mem.RamWriteMode;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEType;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEVar;
+import com.maxeler.maxcompiler.v2.managers.standard.Manager;
+import com.maxeler.maxcompiler.v2.managers.standard.Manager.IOType;
+import com.maxeler.maxcompiler.v2.utils.MathUtils;
+
+public class MappedElementTest {
+	private static final int N = 1000;
+
+	static class MappedElementTestKernel extends Kernel {
+
+		protected MappedElementTestKernel(KernelParameters parameters) {
+			super(parameters);
+
+			DFEType type = dfeFloat(11, 53);
+
+			DFEVar addr = control.count.simpleCounter(MathUtils.bitsToAddress(N));
+
+			// perform a scalar - vector multiply
+			DFEVar a = io.scalarInput("a", type);
+			DFEVar b = mem.romMapped("b", addr, type, N);
+
+			DFEVar result = a * b;
+
+			// output the result to a RAM and to host
+			mem.ramMapped("result", N, RamWriteMode.WRITE_FIRST,
+					mem.makeRamPortParams(RamPortMode.WRITE_ONLY, addr, result));
+
+			io.output("output", type) <== result;
+
+			// put first couple of results into scalarOutputs
+			io.scalarOutput("first",  type, addr.eq(0)) <== result;
+			io.scalarOutput("second", type, addr.eq(1)) <== result;
+		}
+	}
+
+	public static void main(String[] args) {
+		Manager m = new Manager(new EngineParameters(args));
+		m.setKernel(new MappedElementTestKernel(m.makeKernelParameters()));
+		m.setIO(IOType.ALL_CPU);
+		m.build();
+	}
+}

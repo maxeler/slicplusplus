@@ -1,0 +1,28 @@
+package com.maxeler.slic.tests;
+
+import com.maxeler.maxcompiler.v2.build.EngineParameters;
+import com.maxeler.maxcompiler.v2.kernelcompiler.Kernel;
+import com.maxeler.maxcompiler.v2.kernelcompiler.KernelParameters;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEType;
+import com.maxeler.maxcompiler.v2.managers.standard.Manager;
+import com.maxeler.maxcompiler.v2.managers.standard.Manager.IOType;
+
+public class PassthroughTest {
+
+	static class PassthroughTestKernel extends Kernel {
+		protected PassthroughTestKernel(KernelParameters parameters) {
+			super(parameters);
+
+			DFEType type = dfeFloat(11, 53);
+
+			io.output("output", type) <== io.input("input", type);
+		}
+	}
+
+	public static void main(String[] args) {
+		Manager m = new Manager(new EngineParameters(args));
+		m.setKernel(new PassthroughTestKernel(m.makeKernelParameters()));
+		m.setIO(IOType.ALL_CPU);
+		m.build();
+	}
+}
