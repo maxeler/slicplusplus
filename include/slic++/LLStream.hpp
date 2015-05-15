@@ -14,11 +14,13 @@ class LLStream {
 
 	static constexpr size_t MAX_SLOTS = 512;
 
+	size_t numSlots;
 	MemAlignedBuffer buf;
 	std::unique_ptr<max_llstream_t, decltype(max_llstream_release)*> ll;
 
 	LLStream(max_engine_t* engine, const std::string& name, size_t numSlots, size_t slotSize)
-	 : buf(numSlots*slotSize),
+	 : numSlots(numSlots),
+	   buf(numSlots*slotSize),
 	   ll(max_llstream_setup(engine, name.c_str(), numSlots, slotSize, buf), max_llstream_release)
 	{
 		if (!ll) throw std::runtime_error("Failed to instantiate llstream");
@@ -39,6 +41,10 @@ public:
 
 	void write(size_t numSlots) {
 		max_llstream_write(ll.get(), numSlots);
+	}
+
+	size_t getNumSlots() const noexcept {
+		return numSlots;
 	}
 };
 
