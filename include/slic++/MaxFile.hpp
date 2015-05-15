@@ -6,9 +6,9 @@
 #include "Common.hpp"
 #include "Errors.hpp"
 
-#define SLIC_DESIGN(A)				\
-	extern "C" {					\
-		max_file_t* A##_init(void);	\
+#define SLIC_DESIGN(A)              \
+	extern "C" {                    \
+		max_file_t* A##_init(void); \
 	}
 
 SLIC_BEGIN_NAMESPACE
@@ -18,6 +18,7 @@ class MaxFile {
 
 public:
 	explicit MaxFile(const std::function<max_file_t*()>& initFn) : mf(initFn(), max_file_free) {
+		if (!mf) throw std::runtime_error("Failed to instantiate maxfile");
 		max_errors_mode(mf->errors, 0);
 	}
 

@@ -14,7 +14,7 @@ class NetConnection {
 	max_engine_t* engine;
 	max_net_connection_t connection;
 
-	NetConnection(max_engine_t* engine, max_net_connection_t connection)
+	NetConnection(max_engine_t* engine, max_net_connection_t connection) noexcept
 	 : engine(engine), connection(connection) {}
 
 public:

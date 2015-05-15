@@ -16,10 +16,16 @@ class TcpSocket {
 	std::unique_ptr<max_tcp_socket_t, decltype(max_tcp_close)*> s;
 
 	TcpSocket(max_engine_t* engine, const std::string& streamName)
-	 : s(max_tcp_create_socket(engine, streamName.c_str()), max_tcp_close) {}
+	 : s(max_tcp_create_socket(engine, streamName.c_str()), max_tcp_close)
+	{
+		if (!s) throw std::runtime_error("Failed to create TCP socket");
+	}
 
 	TcpSocket(max_engine_t* engine, const std::string& streamName, uint16_t socketNumber)
-	 : s(max_tcp_create_socket_with_number(engine, streamName.c_str(), socketNumber), max_tcp_close) {}
+	 : s(max_tcp_create_socket_with_number(engine, streamName.c_str(), socketNumber), max_tcp_close)
+	{
+		if (!s) throw std::runtime_error("Failed to create TCP socket");
+	}
 
 public:
 	max_tcp_socket_t* get() const noexcept {

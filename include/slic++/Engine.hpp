@@ -20,6 +20,7 @@ public:
 	explicit Engine(const MaxFile& maxfile, const std::string& id="*")
 	 : e(max_load(maxfile.get(), id.c_str()), max_unload)
 	{
+		if (!e) throw std::runtime_error("Failed to load maxfile");
 		max_errors_mode(e->errors, 0);
 	}
 
@@ -55,7 +56,7 @@ public:
 		SLIC_CHECK_ERRORS(e->errors)
 	}
 
-	NetConnection getNetworkConnection(max_net_connection_t connection) {
+	NetConnection getNetworkConnection(max_net_connection_t connection) const noexcept {
 		return { e.get(), connection };
 	}
 

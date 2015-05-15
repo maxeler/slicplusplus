@@ -15,10 +15,16 @@ class UdpSocket {
 	std::unique_ptr<max_udp_socket_t, decltype(max_udp_close)*> s;
 
 	UdpSocket(max_engine_t* engine, const std::string& streamName)
-	 : s(max_udp_create_socket(engine, streamName.c_str()), max_udp_close) {}
+	 : s(max_udp_create_socket(engine, streamName.c_str()), max_udp_close)
+	{
+		if (!s) throw std::runtime_error("Failed to create UDP socket");
+	}
 
 	UdpSocket(max_engine_t* engine, const std::string& streamName, uint16_t socketNumber)
-	 : s(max_udp_create_socket_with_number(engine, streamName.c_str(), socketNumber), max_udp_close) {}
+	 : s(max_udp_create_socket_with_number(engine, streamName.c_str(), socketNumber), max_udp_close)
+	{
+		if (!s) throw std::runtime_error("Failed to create UDP socket");
+	}
 
 public:
 	max_udp_socket_t* get() const noexcept {
