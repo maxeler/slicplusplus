@@ -10,8 +10,7 @@ SLIC_BEGIN_NAMESPACE
 class Engine;
 
 class FramedStream {
-	friend class Engine;
-
+protected:
 	MemAlignedBuffer buf;
 	std::unique_ptr<max_framed_stream_t, decltype(max_framed_stream_release)*> fs;
 
@@ -23,20 +22,38 @@ class FramedStream {
 	}
 
 public:
-	size_t read(size_t numFrames, void** frames, size_t* frameSizes) {
-		return max_framed_stream_read(fs.get(), numFrames, frames, frameSizes);
-	}
+	static constexpr size_t MAX_BUFFER_SIZE = 2*4096*512;
+};
 
-	void readDiscard(size_t numFrames) {
-		max_framed_stream_discard(fs.get(), numFrames);
-	}
+class FramedInputStream : public FramedStream {
+	friend class Engine;
 
+	FramedInputStream(max_engine_t* engine, const std::string& name, size_t bufferSize, size_t maxFrameSize)
+	 : FramedStream(engine, name, bufferSize, maxFrameSize) {}
+
+public:
 	size_t writeAcquire(size_t numFrames, void** frames) {
 		return max_framed_stream_write_acquire(fs.get(), numFrames, frames);
 	}
 
 	void write(size_t numFrames, size_t* sizes) {
 		max_framed_stream_write(fs.get(), numFrames, sizes);
+	}
+};
+
+class FramedOutputStream : public FramedStream {
+	friend class Engine;
+
+	FramedOutputStream(max_engine_t* engine, const std::string& name, size_t bufferSize)
+	 : FramedStream(engine, name, bufferSize, -1) {}
+
+public:
+	size_t read(size_t numFrames, void** frames, size_t* frameSizes) {
+		return max_framed_stream_read(fs.get(), numFrames, frames, frameSizes);
+	}
+
+	void readDiscard(size_t numFrames) {
+		max_framed_stream_discard(fs.get(), numFrames);
 	}
 };
 

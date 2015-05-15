@@ -85,12 +85,24 @@ public:
 		return ret;
 	}
 
-	LLStream createLowLatencyStream(const std::string& name, size_t slotSize, size_t numSlots=LLStream::MAX_SLOTS) {
+	LowLatencyInputStream createLowLatencyInputStream(
+			const std::string& name, size_t slotSize, size_t numSlots=LowLatencyStream::MAX_SLOTS)
+	{
 		return { e.get(), name, numSlots, slotSize };
 	}
 
-	FramedStream createFramedStream(const std::string& name, size_t bufferSize, size_t maxFrameSize) {
+	LowLatencyOutputStream createLowLatencyOutputStream(
+			const std::string& name, size_t slotSize, size_t numSlots=LowLatencyStream::MAX_SLOTS)
+	{
+		return { e.get(), name, numSlots, slotSize };
+	}
+
+	FramedInputStream createFramedInputStream(const std::string& name, size_t bufferSize, size_t maxFrameSize) {
 		return { e.get(), name, bufferSize, maxFrameSize };
+	}
+
+	FramedOutputStream createFramedOutputStream(const std::string& name, size_t bufferSize) {
+		return { e.get(), name, bufferSize };
 	}
 
 	TcpSocket createTcpSocket(const std::string& name) {
