@@ -23,6 +23,14 @@ public:
 		max_errors_mode(e->errors, 0);
 	}
 
+	max_engine_t* get() const noexcept {
+		return e.get();
+	}
+
+	max_engine_t* release() noexcept {
+		return e.release();
+	}
+
 	const MaxFile& getMaxFile() const noexcept {
 		return mf;
 	}
