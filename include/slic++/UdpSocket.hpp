@@ -27,7 +27,7 @@ class UdpSocket {
 	}
 
 public:
-	UdpSocket() = default;
+	UdpSocket() : s(nullptr, max_udp_close) {}
 
 	max_udp_socket_t* get() const noexcept {
 		return s.get();

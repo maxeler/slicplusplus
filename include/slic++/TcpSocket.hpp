@@ -28,7 +28,7 @@ class TcpSocket {
 	}
 
 public:
-	TcpSocket() = default;
+	TcpSocket() : s(nullptr, max_tcp_close) {}
 
 	max_tcp_socket_t* get() const noexcept {
 		return s.get();

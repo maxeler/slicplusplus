@@ -15,6 +15,8 @@ protected:
 	MemAlignedBuffer buf;
 	std::unique_ptr<max_llstream_t, decltype(max_llstream_release)*> ll;
 
+	LowLatencyStream() : ll(nullptr, max_llstream_release) {}
+
 	LowLatencyStream(max_engine_t* engine, const std::string& name, size_t numSlots, size_t slotSize)
 	: numSlots(numSlots),
 	  buf(numSlots*slotSize),
@@ -22,8 +24,6 @@ protected:
 	{
 		if (!ll) throw std::runtime_error("Failed to instantiate llstream");
 	}
-
-	LowLatencyStream() = default;
 
 public:
 	static constexpr size_t MAX_SLOTS = 512;

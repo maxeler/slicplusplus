@@ -12,7 +12,7 @@ class MemAlignedBuffer {
 	std::unique_ptr<void, decltype(free)*> buf;
 
 public:
-	MemAlignedBuffer() = default;
+	MemAlignedBuffer() : buf(nullptr, free) {}
 
 	MemAlignedBuffer(size_t size) : buf(nullptr, free) {
 		void* tmp;
