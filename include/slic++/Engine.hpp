@@ -97,11 +97,15 @@ public:
 		return { e.get(), name, numSlots, slotSize };
 	}
 
-	FramedInputStream createFramedInputStream(const std::string& name, size_t bufferSize, size_t maxFrameSize) {
+	FramedInputStream createFramedInputStream(
+			const std::string& name, size_t maxFrameSize, size_t bufferSize=FramedStream::MAX_BUFFER_SIZE)
+	{
 		return { e.get(), name, bufferSize, maxFrameSize };
 	}
 
-	FramedOutputStream createFramedOutputStream(const std::string& name, size_t bufferSize) {
+	FramedOutputStream createFramedOutputStream(
+			const std::string& name, size_t bufferSize=FramedStream::MAX_BUFFER_SIZE)
+	{
 		return { e.get(), name, bufferSize };
 	}
 
