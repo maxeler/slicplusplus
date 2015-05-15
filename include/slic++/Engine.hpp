@@ -17,7 +17,7 @@ class Engine {
 
 public:
 	explicit Engine(const MaxFile& maxfile, const std::string& id="*")
-	 : mf(mf), e(max_load(maxfile.get(), id.c_str()), max_unload)
+	 : mf(maxfile), e(max_load(maxfile.get(), id.c_str()), max_unload)
 	{
 		if (!e) throw std::runtime_error("Failed to load maxfile");
 		max_errors_mode(e->errors, 0);
