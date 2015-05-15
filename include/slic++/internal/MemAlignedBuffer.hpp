@@ -12,6 +12,8 @@ class MemAlignedBuffer {
 	std::unique_ptr<void, decltype(free)*> buf;
 
 public:
+	MemAlignedBuffer() = default;
+
 	MemAlignedBuffer(size_t size) : buf(nullptr, free) {
 		void* tmp;
 		if (posix_memalign(&tmp, PAGE_SIZE, size)) throw std::bad_alloc();

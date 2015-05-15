@@ -23,6 +23,8 @@ protected:
 		if (!ll) throw std::runtime_error("Failed to instantiate llstream");
 	}
 
+	LowLatencyStream() = default;
+
 public:
 	static constexpr size_t MAX_SLOTS = 512;
 
@@ -38,6 +40,8 @@ class LowLatencyInputStream : public LowLatencyStream {
 	 : LowLatencyStream(engine, name, numSlots, slotSize) {}
 
 public:
+	LowLatencyInputStream() = default;
+
 	ssize_t writeAcquire(size_t numSlots, void** slots) {
 		return max_llstream_write_acquire(ll.get(), numSlots, slots);
 	}
@@ -54,6 +58,8 @@ class LowLatencyOutputStream : public LowLatencyStream {
 	 : LowLatencyStream(engine, name, numSlots, slotSize) {}
 
 public:
+	LowLatencyOutputStream() = default;
+
 	ssize_t read(size_t numSlots, void** slots) {
 		return max_llstream_read(ll.get(), numSlots, slots);
 	}

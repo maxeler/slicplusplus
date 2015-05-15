@@ -21,6 +21,8 @@ protected:
 		if (!fs) throw std::runtime_error("Failed to instantiate framed stream");
 	}
 
+	FramedStream() = default;
+
 public:
 	static constexpr size_t MAX_BUFFER_SIZE = 2*4096*512;
 };
@@ -32,6 +34,8 @@ class FramedInputStream : public FramedStream {
 	 : FramedStream(engine, name, bufferSize, maxFrameSize) {}
 
 public:
+	FramedInputStream() = default;
+
 	size_t writeAcquire(size_t numFrames, void** frames) {
 		return max_framed_stream_write_acquire(fs.get(), numFrames, frames);
 	}
@@ -48,6 +52,8 @@ class FramedOutputStream : public FramedStream {
 	 : FramedStream(engine, name, bufferSize, -1) {}
 
 public:
+	FramedOutputStream() = default;
+
 	size_t read(size_t numFrames, void** frames, size_t* frameSizes) {
 		return max_framed_stream_read(fs.get(), numFrames, frames, frameSizes);
 	}
