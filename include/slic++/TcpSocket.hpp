@@ -28,6 +28,8 @@ class TcpSocket {
 	}
 
 public:
+	TcpSocket() = default;
+
 	max_tcp_socket_t* get() const noexcept {
 		return s.get();
 	}
