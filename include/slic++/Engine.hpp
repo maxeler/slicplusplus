@@ -9,19 +9,22 @@
 #include "TcpSocket.hpp"
 #include "UdpSocket.hpp"
 
-extern "C" max_file_t* max_engine_get_max_file(max_engine_t *engine);
-
 SLIC_BEGIN_NAMESPACE
 
 class Engine {
+	const MaxFile& mf;
 	std::unique_ptr<max_engine_t, decltype(max_unload)*> e;
 
 public:
 	explicit Engine(const MaxFile& maxfile, const std::string& id="*")
-	 : e(max_load(maxfile.get(), id.c_str()), max_unload)
+	 : mf(mf), e(max_load(maxfile.get(), id.c_str()), max_unload)
 	{
 		if (!e) throw std::runtime_error("Failed to load maxfile");
 		max_errors_mode(e->errors, 0);
+	}
+
+	const MaxFile& getMaxFile() const noexcept {
+		return mf;
 	}
 
 	void run(const Actions& actions) {
@@ -61,14 +64,14 @@ public:
 	}
 
 	NetConnection getTcpStreamNetworkConnection(const std::string& streamName) {
-		auto mf  = max_engine_get_max_file(e.get());
+		auto mf  = getMaxFile().get();
 		auto ret = getNetworkConnection(max_tcp_get_network_connection(mf, streamName.c_str()));
 		SLIC_CHECK_ERRORS(mf->errors)
 		return ret;
 	}
 
 	NetConnection getUdpStreamNetworkConnection(const std::string& streamName) {
-		auto mf  = max_engine_get_max_file(e.get());
+		auto mf  = getMaxFile().get();
 		auto ret = getNetworkConnection(max_udp_get_network_connection(mf, streamName.c_str()));
 		SLIC_CHECK_ERRORS(mf->errors)
 		return ret;
