@@ -42,7 +42,7 @@ class LowLatencyInputStream : public LowLatencyStream {
 public:
 	LowLatencyInputStream() = default;
 
-	ssize_t writeAcquire(size_t numSlots, void** slots) {
+	ssize_t acquire(size_t numSlots, void** slots) {
 		return max_llstream_write_acquire(ll.get(), numSlots, slots);
 	}
 
@@ -64,7 +64,7 @@ public:
 		return max_llstream_read(ll.get(), numSlots, slots);
 	}
 
-	void readDiscard(size_t numSlots) {
+	void discard(size_t numSlots) {
 		max_llstream_read_discard(ll.get(), numSlots);
 	}
 };

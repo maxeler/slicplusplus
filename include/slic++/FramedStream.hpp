@@ -36,7 +36,7 @@ class FramedInputStream : public FramedStream {
 public:
 	FramedInputStream() = default;
 
-	size_t writeAcquire(size_t numFrames, void** frames) {
+	size_t acquire(size_t numFrames, void** frames) {
 		return max_framed_stream_write_acquire(fs.get(), numFrames, frames);
 	}
 
@@ -58,7 +58,7 @@ public:
 		return max_framed_stream_read(fs.get(), numFrames, frames, frameSizes);
 	}
 
-	void readDiscard(size_t numFrames) {
+	void discard(size_t numFrames) {
 		max_framed_stream_discard(fs.get(), numFrames);
 	}
 };
