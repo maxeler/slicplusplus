@@ -19,7 +19,10 @@ public:
 	explicit Engine(const MaxFile& maxfile, const std::string& id="*")
 	 : mf(maxfile), e(max_load(maxfile.get(), id.c_str()), max_unload)
 	{
-		if (!e) throw std::runtime_error("Failed to load maxfile");
+		if (!e) {
+			SLIC_CHECK_ERRORS(mf.get()->errors)
+			throw std::runtime_error("Failed to load maxfile onto engine");
+		}
 		max_errors_mode(e->errors, 0);
 	}
 

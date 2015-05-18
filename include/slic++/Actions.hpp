@@ -13,7 +13,10 @@ public:
 	explicit Actions(const MaxFile& maxfile, const std::string& mode="")
 	 : a(max_actions_init(maxfile.get(), mode.empty() ? NULL : mode.c_str()), max_actions_free)
 	{
-		if (!a) throw std::runtime_error("Failed to instantiate actions");
+		if (!a) {
+			SLIC_CHECK_ERRORS(maxfile.get()->errors)
+			throw std::runtime_error("Failed to instantiate actions");
+		}
 		max_errors_mode(a->errors, 0);
 	}
 
