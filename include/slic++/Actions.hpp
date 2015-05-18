@@ -29,23 +29,23 @@ public:
 	// SCALARS
 	////////////////////
 
-	void set(const std::string& blockName, const std::string& regName, double value) {
-		max_set_double(a.get(), blockName.c_str(), regName.c_str(), value);
-		SLIC_CHECK_ERRORS(a->errors)
-	}
-
 	void set(const std::string& blockName, const std::string& regName, uint64_t value) {
 		max_set_uint64t(a.get(), blockName.c_str(), regName.c_str(), value);
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
-	void get(const std::string& blockName, const std::string& regName, double* ret) {
-		max_get_double(a.get(), blockName.c_str(), regName.c_str(), ret);
+	void setDouble(const std::string& blockName, const std::string& regName, double value) {
+		max_set_double(a.get(), blockName.c_str(), regName.c_str(), value);
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
 	void get(const std::string& blockName, const std::string& regName, uint64_t* ret) {
 		max_get_uint64t(a.get(), blockName.c_str(), regName.c_str(), ret);
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
+	void getDouble(const std::string& blockName, const std::string& regName, double* ret) {
+		max_get_double(a.get(), blockName.c_str(), regName.c_str(), ret);
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
@@ -58,13 +58,13 @@ public:
 	// PARAMS, OFFSETS
 	////////////////////
 
-	void setParam(const std::string& name, double value) {
-		max_set_param_double(a.get(), name.c_str(), value);
+	void setParam(const std::string& name, uint64_t value) {
+		max_set_param_uint64t(a.get(), name.c_str(), value);
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
-	void setParam(const std::string& name, uint64_t value) {
-		max_set_param_uint64t(a.get(), name.c_str(), value);
+	void setParamDouble(const std::string& name, double value) {
+		max_set_param_double(a.get(), name.c_str(), value);
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
@@ -97,7 +97,7 @@ public:
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
-	void setMem(const std::string& blockName, const std::string& memName, size_t idx, double value) {
+	void setMemDouble(const std::string& blockName, const std::string& memName, size_t idx, double value) {
 		max_set_mem_double(a.get(), blockName.c_str(), memName.c_str(), idx, value);
 		SLIC_CHECK_ERRORS(a->errors)
 	}
@@ -113,7 +113,7 @@ public:
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
-	void getMem(const std::string& blockName, const std::string& memName, size_t idx, double* ret) {
+	void getMemDouble(const std::string& blockName, const std::string& memName, size_t idx, double* ret) {
 		max_get_mem_double(a.get(), blockName.c_str(), memName.c_str(), idx, ret);
 		SLIC_CHECK_ERRORS(a->errors)
 	}
