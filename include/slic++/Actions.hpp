@@ -157,7 +157,7 @@ public:
 	////////////////////
 
 	void route(const std::string& fromName, const std::string& toName) {
-		max_route(a.get(), fromName.c_str(), toName.c_str());
+		max_route(a.get(), fromName.c_str(), toName.empty() ? nullptr : toName.c_str());
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
