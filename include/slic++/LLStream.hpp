@@ -31,6 +31,12 @@ public:
 	size_t getNumSlots() const noexcept {
 		return numSlots;
 	}
+
+	static size_t nextPowerOfTwo(size_t value) {
+		size_t res = 1;
+		while (res < value) res <<= 1;
+		return res;
+	}
 };
 
 class LowLatencyInputStream : public LowLatencyStream {
