@@ -7,17 +7,21 @@
 SLIC_BEGIN_NAMESPACE
 
 class Actions {
+protected:
 	std::unique_ptr<max_actions_t, decltype(max_actions_free)*> a;
+
+	Actions(max_actions_t* actions) : a(actions, max_actions_free) {
+		max_errors_mode(a->errors, 0);
+	}
 
 public:
 	explicit Actions(const MaxFile& maxfile, const std::string& mode="")
-	 : a(max_actions_init(maxfile.get(), mode.empty() ? NULL : mode.c_str()), max_actions_free)
+	 : Actions(max_actions_init(maxfile.get(), mode.empty() ? NULL : mode.c_str()))
 	{
 		if (!a) {
 			SLIC_CHECK_ERRORS(maxfile.get()->errors)
 			throw std::runtime_error("Failed to instantiate actions");
 		}
-		max_errors_mode(a->errors, 0);
 	}
 
 	max_actions_t* get() const noexcept {
@@ -200,6 +204,15 @@ public:
 	void setWatchRange(const std::string& kernelName, int minTick, int maxTick) {
 		max_watch_range(a.get(), kernelName.c_str(), minTick, maxTick);
 		SLIC_CHECK_ERRORS(a->errors)
+	}
+};
+
+class ActionsExplicit : public Actions {
+	explicit ActionsExplicit(const MaxFile& maxfile) : Actions(max_actions_init_explicit(maxfile.get())) {
+		if (!a) {
+			SLIC_CHECK_ERRORS(maxfile.get()->errors)
+			throw std::runtime_error("Failed to instantiate explicit actions");
+		}
 	}
 };
 
