@@ -38,12 +38,12 @@ int main() {
 	vector<double> fromStream(N);
 	vector<double> fromRAM(N);
 
-	actions.get("MappedElementTestKernel", "first",  &first);
-	actions.get("MappedElementTestKernel", "second", &second);
+	actions.getDouble("MappedElementTestKernel", "first",  &first);
+	actions.getDouble("MappedElementTestKernel", "second", &second);
 
 	// the output vectors are sized correctly above
 	for (uint i = 0; i < N; ++i) {
-		actions.getMem("MappedElementTestKernel", "result", i, &fromRAM[i]);
+		actions.getMemDouble("MappedElementTestKernel", "result", i, &fromRAM[i]);
 	}
 
 	actions.queueOutput("output", fromStream.data(), fromStream.size()*sizeof(double));
