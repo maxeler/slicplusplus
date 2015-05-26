@@ -208,6 +208,7 @@ public:
 };
 
 class ActionsExplicit : public Actions {
+public:
 	explicit ActionsExplicit(const MaxFile& maxfile) : Actions(max_actions_init_explicit(maxfile.get())) {
 		if (!a) {
 			SLIC_CHECK_ERRORS(maxfile.get()->errors)
