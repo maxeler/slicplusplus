@@ -12,14 +12,14 @@ class Engine;
 class LowLatencyStream {
 protected:
 	size_t numSlots;
+	size_t slotSize;
 	MemAlignedBuffer buf;
 	std::unique_ptr<max_llstream_t, decltype(max_llstream_release)*> ll;
 
 	LowLatencyStream() : ll(nullptr, max_llstream_release) {}
 
 	LowLatencyStream(max_engine_t* engine, const std::string& name, size_t numSlots, size_t slotSize)
-	: numSlots(numSlots),
-	  buf(numSlots*slotSize),
+	: numSlots(numSlots), slotSize(slotSize), buf(numSlots*slotSize),
 	  ll(max_llstream_setup(engine, name.c_str(), numSlots, slotSize, buf), max_llstream_release)
 	{
 		if (!ll) throw std::runtime_error("Failed to instantiate llstream");
@@ -30,6 +30,10 @@ public:
 
 	size_t getNumSlots() const noexcept {
 		return numSlots;
+	}
+
+	size_t getSlotSize() const noexcept {
+		return slotSize;
 	}
 
 	static size_t nextPowerOfTwo(size_t value) {
