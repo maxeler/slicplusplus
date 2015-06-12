@@ -140,6 +140,11 @@ public:
 		SLIC_CHECK_ERRORS(a->errors)
 	}
 
+	void enablePartialMemory() {
+		max_enable_partial_memory(a.get());
+		SLIC_CHECK_ERRORS(a->errors)
+	}
+
 	////////////////////
 	// STREAMS
 	////////////////////
@@ -214,6 +219,10 @@ public:
 			SLIC_CHECK_ERRORS(maxfile.get()->errors)
 			throw std::runtime_error("Failed to instantiate explicit actions");
 		}
+
+		// make it, you know, actually explicit
+		// this should be the default behaviour in SLiC... there's a ticket open
+		enablePartialMemory();
 	}
 };
 
